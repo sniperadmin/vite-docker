@@ -1,28 +1,22 @@
-# This is a basic workflow to help you get started with Actions
+name: Container Builder
 
-name: Docker-Image
-
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+  - push
+  - pull_request
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
+  container-builder:
     runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+      - name: Check out repository
+        uses: actions/checkout@v2
 
-    - name: Publish Image
-      uses: matootie/github-docker@v2.2.2
-      with:
-        accessToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build container image
+        uses: snapserv/action-container-builder@master
+        with:
+          target_repository: vite-docker/github-vite-image
+          target_registry_username: {{ secrets.DOCKERHUB_USERNAME }}
+          target_registry_password: {{ secrets.DOCKERHUB_PASSWORD }}
+          cache_repository: docker.pkg.github.com/${{ github.repository }}/github-vite-image
+          cache_registry_username: ${{ github.repository_owner }}
+          cache_registry_password: ${{ secrets.GITHUB_TOKEN }}
